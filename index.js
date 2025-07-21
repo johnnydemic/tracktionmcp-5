@@ -1,4 +1,13 @@
+import http from 'http';
 import fetch from 'node-fetch';
+
+// ✅ Add this simple /health check so Railway + Smithery validate your app
+http.createServer((req, res) => {
+  if (req.url === '/health') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+  }
+}).listen(8080);
 
 console.error('🚀 Tracktion MCP Server Started');
 
