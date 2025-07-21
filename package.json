@@ -1,5 +1,5 @@
 {
-  "name": "tracktion-mcp-server",
+  "name": "tracktion-mcp",
   "version": "1.0.0",
   "type": "module",
   "main": "index.js",
@@ -7,6 +7,7 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "smithery-mcp": "git+https://github.com/smithery-dev/mcp.git"
+    "express": "^4.18.2",
+    "smithery-mcp": "https://github.com/smithery-dev/mcp.git"
   }
 }
