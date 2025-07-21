@@ -1,0 +1,36 @@
+name: tracktion-mcp
+description: MCP server for ad + business insights
+version: 0.1.0
+
+build:
+  type: docker
+  dockerfile: Dockerfile
+
+startCommand:
+  type: stdio
+
+configSchema:
+  type: object
+  required: [META_ACCESS_TOKEN, TIKTOK_ACCESS_TOKEN]
+  properties:
+    META_ACCESS_TOKEN: { type: string }
+    TIKTOK_ACCESS_TOKEN: { type: string }
+
+commandFunction: |
+  (cfg) => ({
+    command: "node",
+    args: ["index.js"],
+    env: { ...process.env, ...cfg }
+  })
+
+capabilities:
+  tools:
+    - name: get-monthly-spend-meta
+      description: Get Meta ad spend
+      parameters: { ad_account_id: string }
+    - name: get-monthly-spend-tiktok
+      description: Get TikTok ad spend
+      parameters: { advertiser_id: string }
+    - name: get-business-profile
+      description: Receive business profile inputs
+      parameters: { data: object }
