@@ -1,0 +1,80 @@
+name: Tracktion Analytics Server
+description: >
+  Provide AI-driven insights on monthly ad spend and key business metrics across platforms like Meta, TikTok, and Google Ads. 
+  Enable quick access to metrics such as MRR, AOV, niche, and ROAS to optimize marketing strategies. 
+  Integrated with Smithery for seamless consulting.
+
+tools:
+  - name: analyzePerformance
+    description: Analyze ad performance across Meta, TikTok, and Google Ads using provided metrics.
+    input_schema:
+      type: object
+      properties:
+        meta_spend:
+          type: number
+          description: Monthly ad spend on Meta
+        tiktok_spend:
+          type: number
+          description: Monthly ad spend on TikTok
+        google_spend:
+          type: number
+          description: Monthly ad spend on Google Ads
+        mmr:
+          type: number
+          description: Monthly recurring revenue
+        aov:
+          type: number
+          description: Average order value
+        conversion_rate:
+          type: number
+          description: Conversion rate percentage
+        roas_goal:
+          type: number
+          description: Target return on ad spend
+        niche:
+          type: string
+          description: Business niche
+        website_url:
+          type: string
+          description: Client's website URL
+      required:
+        - meta_spend
+        - tiktok_spend
+        - google_spend
+        - mmr
+        - aov
+        - conversion_rate
+        - roas_goal
+        - niche
+        - website_url
+    output_schema:
+      type: object
+      properties:
+        insights:
+          type: string
+          description: Strategic recommendations based on the provided ad and business data.
+
+prompts:
+  - name: analyzePerformance
+    tool: analyzePerformance
+    prompt: |
+      Based on the following data, generate clear and actionable consulting insights:
+      - Meta Spend: {{meta_spend}}
+      - TikTok Spend: {{tiktok_spend}}
+      - Google Spend: {{google_spend}}
+      - MRR: {{mmr}}
+      - AOV: {{aov}}
+      - Conversion Rate: {{conversion_rate}}%
+      - ROAS Goal: {{roas_goal}}
+      - Niche: {{niche}}
+      - Website: {{website_url}}
+
+      Provide a detailed recommendation including:
+      1. Performance issues or wins
+      2. Suggestions to optimize ROAS
+      3. Audience or creative strategy improvements
+      4. Anything broken or missing
+
+model:
+  provider: openai
+  model: gpt-4-1106-preview
