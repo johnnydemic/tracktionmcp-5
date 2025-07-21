@@ -1,7 +1,12 @@
-"type": "module",
-"scripts": {
-  "start": "node index.js"
-},
-"dependencies": {
-  "@smithery/mcp": "^0.1.14"
+{
+  "name": "tracktion-mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "smithery-mcp": "git+https://github.com/smithery-dev/mcp.git"
+  }
 }
