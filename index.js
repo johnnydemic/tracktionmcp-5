@@ -47,6 +47,10 @@ app.post('/', async (req, res) => {
   return res.status(400).json({ jsonrpc: '2.0', id, error: 'Unknown method' });
 });
 
+// ✅ Add this health check route
+app.get('/health', (_, res) => res.send('OK'));
+
+// Home route
 app.get('/', (_, res) => res.send('Tracktion MCP is running!'));
 
 app.listen(8080, () => {
