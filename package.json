@@ -1,12 +1,7 @@
-{
-  "name": "tracktion-mcp",
-  "version": "1.0.0",
-  "type": "module",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  }
+"type": "module",
+"scripts": {
+  "start": "node index.js"
+},
+"dependencies": {
+  "@smithery/mcp": "^0.1.14"
 }
