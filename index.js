@@ -5,6 +5,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Safe check to only parse valid JSON
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).send({ status: 'error', message: 'Invalid JSON' });
+  }
+  next();
+});
+
 // Tool definitions
 const tools = [
   {
@@ -67,13 +75,13 @@ app.post('/jsonrpc', (req, res) => {
   });
 });
 
-// Basic GET route to verify server is alive
+// Root route to verify server is alive
 app.get('/', (_, res) => {
   res.send('✅ Tracktion MCP server is live!');
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
