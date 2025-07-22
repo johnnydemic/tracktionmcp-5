@@ -1,55 +1,72 @@
 import express from 'express';
-import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const app = express();
-app.use(bodyParser.json());
+app.use(cors());
+app.use(express.json());
 
-const tools = {
-  "get-business-profile": async ({ data }) => {
-    return {
-      summary: `You are running a business with URL ${data.website}.`,
-    };
-  }
-};
-
-app.post('/', async (req, res) => {
-  const { method, id, params } = req.body;
-
-  if (method === 'initialize') {
-    return res.json({
-      jsonrpc: '2.0',
-      id,
-      result: {
-        name: 'Tracktion MCP Server',
-        version: '1.0.0',
-        tools: Object.keys(tools),
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "ad_spend_and_performance",
+      description: "Breakdown of monthly ad spend across platforms",
+      parameters: {
+        type: "object",
+        properties: {
+          monthly_ad_spend: { type: "number" },
+          meta_spend: { type: "number" },
+          tiktok_spend: { type: "number" },
+          google_spend: { type: "number" },
+          other_spend: { type: "number" }
+        },
+        required: ["monthly_ad_spend"]
       }
-    });
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "business_metrics",
+      description: "Key business metrics",
+      parameters: {
+        type: "object",
+        properties: {
+          website_url: { type: "string" },
+          mrr: { type: "number" },
+          aov: { type: "number" },
+          conversion_rate: { type: "number" },
+          niche: { type: "string" }
+        },
+        required: ["website_url"]
+      }
+    }
   }
+];
 
-  if (method === 'tools/list') {
+// Handle /jsonrpc POST for OpenAI
+app.post('/jsonrpc', (req, res) => {
+  const { method, id } = req.body;
+
+  if (method === 'tools') {
     return res.json({
       jsonrpc: '2.0',
       id,
-      result: Object.keys(tools),
+      result: tools
     });
   }
 
-  if (method === 'tools/call') {
-    const { name, args } = params;
-    if (!tools[name]) {
-      return res.status(404).json({ jsonrpc: '2.0', id, error: 'Tool not found' });
+  return res.status(404).json({
+    jsonrpc: '2.0',
+    id,
+    error: {
+      code: -32601,
+      message: 'Method not found'
     }
-    const result = await tools[name](args);
-    return res.json({ jsonrpc: '2.0', id, result });
-  }
-
-  return res.status(400).json({ jsonrpc: '2.0', id, error: 'Unknown method' });
+  });
 });
-
-app.get('/', (_, res) => res.send('✅ Tracktion MCP is running!'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🚀 MCP server live on port ${PORT}`);
+  console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
