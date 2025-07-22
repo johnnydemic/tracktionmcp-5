@@ -3,15 +3,7 @@ import cors from 'cors';
 
 const app = express();
 app.use(cors());
-app.use(express.json());
-
-// Safe check to only parse valid JSON
-app.use((err, req, res, next) => {
-  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-    return res.status(400).send({ status: 'error', message: 'Invalid JSON' });
-  }
-  next();
-});
+app.use(express.json({ type: 'application/json' }));
 
 // Tool definitions
 const tools = [
@@ -53,9 +45,13 @@ const tools = [
   }
 ];
 
-// POST /jsonrpc for OpenAI to fetch tools
+// ✅ POST route for OpenAI Studio to call
 app.post('/jsonrpc', (req, res) => {
   const { method, id } = req.body;
+
+  if (!method || !id) {
+    return res.status(400).json({ error: "Invalid JSON-RPC request." });
+  }
 
   if (method === 'tools') {
     return res.json({
@@ -75,13 +71,13 @@ app.post('/jsonrpc', (req, res) => {
   });
 });
 
-// Root route to verify server is alive
+// Test GET route
 app.get('/', (_, res) => {
-  res.send('✅ Tracktion MCP server is live!');
+  res.send('✅ Tracktion MCP is live');
 });
 
 // Start server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
