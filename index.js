@@ -14,11 +14,11 @@ const tools = [
       parameters: {
         type: "object",
         properties: {
-          monthly_ad_spend: { type: "number", description: "Total monthly ad spend" },
-          meta_spend: { type: "number", description: "Spend on Meta (Facebook & Instagram)" },
-          tiktok_spend: { type: "number", description: "Spend on TikTok" },
-          google_spend: { type: "number", description: "Spend on Google" },
-          other_spend: { type: "number", description: "Spend on other platforms" }
+          monthly_ad_spend: { type: "number" },
+          meta_spend: { type: "number" },
+          tiktok_spend: { type: "number" },
+          google_spend: { type: "number" },
+          other_spend: { type: "number" }
         },
         required: ["monthly_ad_spend"]
       }
@@ -32,11 +32,11 @@ const tools = [
       parameters: {
         type: "object",
         properties: {
-          website_url: { type: "string", description: "Your brand’s website" },
-          mrr: { type: "number", description: "Monthly Recurring Revenue" },
-          aov: { type: "number", description: "Average Order Value" },
-          conversion_rate: { type: "number", description: "Conversion rate of your site" },
-          niche: { type: "string", description: "Industry or niche of the business" }
+          website_url: { type: "string" },
+          mrr: { type: "number" },
+          aov: { type: "number" },
+          conversion_rate: { type: "number" },
+          niche: { type: "string" }
         },
         required: ["website_url"]
       }
@@ -44,43 +44,34 @@ const tools = [
   }
 ];
 
-// POST handler for OpenAI /jsonrpc tool fetch
-app.post('/jsonrpc', (req, res) => {
-  try {
-    const { method, id } = req.body;
-    if (method === 'tools') {
-      return res.json({
-        jsonrpc: '2.0',
-        id,
-        result: tools
-      });
-    }
+// Support both `/jsonrpc` and `/` to prevent 404
+const handlePost = (req, res) => {
+  const { method, id } = req.body;
 
-    res.status(404).json({
+  if (method === 'tools') {
+    return res.json({
       jsonrpc: '2.0',
       id,
-      error: {
-        code: -32601,
-        message: 'Method not found'
-      }
-    });
-  } catch (err) {
-    res.status(400).json({
-      jsonrpc: '2.0',
-      error: {
-        code: -32700,
-        message: 'Invalid JSON'
-      }
+      result: tools
     });
   }
-});
 
-// GET route just to verify server is running
-app.get('/', (_, res) => {
-  res.send('✅ Tracktion MCP is live!');
-});
+  res.status(404).json({
+    jsonrpc: '2.0',
+    id,
+    error: {
+      code: -32601,
+      message: 'Method not found'
+    }
+  });
+};
 
-const PORT = process.env.PORT || 8080;
+app.post('/jsonrpc', handlePost);
+app.post('/', handlePost); // 👈 This line fixes the OpenAI issue
+
+app.get('/', (_, res) => res.send('✅ Tracktion MCP server is live!'));
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
