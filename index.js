@@ -44,7 +44,7 @@ const tools = [
   }
 ];
 
-// Support both `/jsonrpc` and `/` to prevent 404
+// Unified handler
 const handlePost = (req, res) => {
   const { method, id } = req.body;
 
@@ -67,11 +67,11 @@ const handlePost = (req, res) => {
 };
 
 app.post('/jsonrpc', handlePost);
-app.post('/', handlePost); // 👈 This line fixes the OpenAI issue
+app.post('/', handlePost);
 
 app.get('/', (_, res) => res.send('✅ Tracktion MCP server is live!'));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // ✅ fallback added
 app.listen(PORT, () => {
   console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
