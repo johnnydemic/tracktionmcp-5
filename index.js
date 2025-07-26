@@ -5,7 +5,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// TOOL DEFINITIONS
 const tools = [
   {
     type: "function",
@@ -45,7 +44,7 @@ const tools = [
   }
 ];
 
-// ✅ POST /jsonrpc (for OpenAI to fetch tools)
+// 👇 This route must exist
 app.post('/jsonrpc', (req, res) => {
   const { method, id } = req.body;
 
@@ -57,7 +56,7 @@ app.post('/jsonrpc', (req, res) => {
     });
   }
 
-  res.status(404).json({
+  return res.status(404).json({
     jsonrpc: '2.0',
     id,
     error: {
@@ -67,19 +66,12 @@ app.post('/jsonrpc', (req, res) => {
   });
 });
 
-// ✅ GET /jsonrpc (optional test/debug)
-app.get('/jsonrpc', (_, res) => {
-  res.send("✅ /jsonrpc is live. Use POST to fetch tools.");
-});
-
-// ✅ Health check
+// Optional GET route to test if server is alive
 app.get('/', (_, res) => {
-  res.send('✅ Tracktion MCP is running!');
+  res.send('✅ Tracktion MCP is alive!');
 });
 
-// ✅ Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`✅ Tracktion MCP server running on port ${PORT}`);
+  console.log(`✅ MCP server running on port ${PORT}`);
 });
-
