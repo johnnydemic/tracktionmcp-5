@@ -1,16 +1,27 @@
+import express from 'express';
+import cors from 'cors';
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.get('/', (_, res) => {
+  res.send("✅ MCP Server is Live");
+});
+
 app.post("/jsonrpc", async (req, res) => {
   const { method, params, id } = req.body;
 
   if (method === "ad_spend_and_performance") {
     const { monthly_ad_spend, meta_spend, tiktok_spend, google_spend, other_spend } = params;
 
-    const tikTokROAS = tiktok_spend / monthly_ad_spend;
-    let recommendation = "Your TikTok budget is proportionate to your overall spend.";
+    const tikTokRatio = tiktok_spend / monthly_ad_spend;
+    let recommendation = "Your TikTok budget is balanced.";
 
-    if (tikTokROAS < 0.25) {
-      recommendation = "Consider increasing your TikTok budget — it's underutilized compared to total spend.";
-    } else if (tikTokROAS > 0.4) {
-      recommendation = "You're heavily invested in TikTok — monitor ROAS closely to ensure profitability.";
+    if (tikTokRatio < 0.2) {
+      recommendation = "Consider increasing TikTok spend to capture more top-of-funnel demand.";
+    } else if (tikTokRatio > 0.5) {
+      recommendation = "You're heavily invested in TikTok — make sure ROAS justifies it.";
     }
 
     return res.json({
@@ -23,12 +34,11 @@ app.post("/jsonrpc", async (req, res) => {
   if (method === "business_metrics") {
     const { website_url, mrr, aov, conversion_rate, niche } = params;
 
-    let insight = "Your conversion rate is average for your niche.";
-
+    let insight = "Your conversion rate looks average.";
     if (conversion_rate < 2) {
-      insight = "Your conversion rate is below average — try improving product page load speed or CTAs.";
+      insight = "Your conversion rate is low — improve landing pages or optimize for mobile.";
     } else if (conversion_rate > 4) {
-      insight = "Strong conversion rate! Keep iterating on what’s working.";
+      insight = "Great conversion rate! Scale with similar creatives.";
     }
 
     return res.json({
@@ -46,4 +56,9 @@ app.post("/jsonrpc", async (req, res) => {
       message: "Method not found"
     }
   });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ Tracktion MCP server running on port ${PORT}`);
 });
