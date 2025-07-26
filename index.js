@@ -1,77 +1,49 @@
-import express from 'express';
-import cors from 'cors';
+app.post("/jsonrpc", async (req, res) => {
+  const { method, params, id } = req.body;
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+  if (method === "ad_spend_and_performance") {
+    const { monthly_ad_spend, meta_spend, tiktok_spend, google_spend, other_spend } = params;
 
-const tools = [
-  {
-    type: "function",
-    function: {
-      name: "ad_spend_and_performance",
-      description: "Breakdown of monthly ad spend across platforms",
-      parameters: {
-        type: "object",
-        properties: {
-          monthly_ad_spend: { type: "number" },
-          meta_spend: { type: "number" },
-          tiktok_spend: { type: "number" },
-          google_spend: { type: "number" },
-          other_spend: { type: "number" }
-        },
-        required: ["monthly_ad_spend"]
-      }
+    const tikTokROAS = tiktok_spend / monthly_ad_spend;
+    let recommendation = "Your TikTok budget is proportionate to your overall spend.";
+
+    if (tikTokROAS < 0.25) {
+      recommendation = "Consider increasing your TikTok budget — it's underutilized compared to total spend.";
+    } else if (tikTokROAS > 0.4) {
+      recommendation = "You're heavily invested in TikTok — monitor ROAS closely to ensure profitability.";
     }
-  },
-  {
-    type: "function",
-    function: {
-      name: "business_metrics",
-      description: "Key business metrics",
-      parameters: {
-        type: "object",
-        properties: {
-          website_url: { type: "string" },
-          mrr: { type: "number" },
-          aov: { type: "number" },
-          conversion_rate: { type: "number" },
-          niche: { type: "string" }
-        },
-        required: ["website_url"]
-      }
-    }
-  }
-];
 
-// 👇 This route must exist
-app.post('/jsonrpc', (req, res) => {
-  const { method, id } = req.body;
-
-  if (method === 'tools') {
     return res.json({
-      jsonrpc: '2.0',
-      id,
-      result: tools
+      jsonrpc: "2.0",
+      result: { recommendation },
+      id
+    });
+  }
+
+  if (method === "business_metrics") {
+    const { website_url, mrr, aov, conversion_rate, niche } = params;
+
+    let insight = "Your conversion rate is average for your niche.";
+
+    if (conversion_rate < 2) {
+      insight = "Your conversion rate is below average — try improving product page load speed or CTAs.";
+    } else if (conversion_rate > 4) {
+      insight = "Strong conversion rate! Keep iterating on what’s working.";
+    }
+
+    return res.json({
+      jsonrpc: "2.0",
+      result: { insight },
+      id
     });
   }
 
   return res.status(404).json({
-    jsonrpc: '2.0',
+    jsonrpc: "2.0",
     id,
     error: {
       code: -32601,
-      message: 'Method not found'
+      message: "Method not found"
     }
   });
-});
-
-// Optional GET route to test if server is alive
-app.get('/', (_, res) => {
-  res.send('✅ Tracktion MCP is alive!');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`✅ MCP server running on port ${PORT}`);
 });
